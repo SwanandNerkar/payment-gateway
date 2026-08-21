@@ -34,11 +34,11 @@ public class ApiKey {
     @Column(name = "key_id", unique = true, nullable = false, length = 50)
     private String keyId;
 
-    @Column(name ="key_secret" ,nullable = false, length = 200)
-    private String keySecret;
+    @Column(name ="key_secret_hash" ,nullable = false, length = 200)
+    private String keySecretHash;
 
-    @Column(nullable = false, length = 50)
-    private String webhook_secret_hash;
+    @Column(length = 200)
+    private String previousSecretHash;
 
     // provide support for development and testing environment
     @Enumerated(EnumType.STRING)

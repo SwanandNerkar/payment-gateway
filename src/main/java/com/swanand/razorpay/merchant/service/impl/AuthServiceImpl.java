@@ -10,14 +10,15 @@ import com.swanand.razorpay.merchant.entity.Merchant;
 import com.swanand.razorpay.merchant.repository.AppUserRepository;
 import com.swanand.razorpay.merchant.repository.MerchantRepository;
 import com.swanand.razorpay.merchant.service.AuthService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class AuthServiceImpl implements AuthService {
 
     private final MerchantRepository merchantRepository;
