@@ -1,17 +1,23 @@
 package com.swanand.razorpay.common.entity;
 
 import jakarta.persistence.Embeddable;
+import lombok.*;
 
 @Embeddable
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
 public class Money {
     // smallest unit of any currency, like paise for INR, cents for Doller
-    private final int amountUnits;
-    private final String currency;
+    private int amountUnits;
+    private String currency;
 
-    private Money(int amountUnits, String currency) {
-        this.amountUnits = amountUnits;
-        this.currency = currency;
-    }
+//    private Money(int amountUnits, String currency) {
+//        this.amountUnits = amountUnits;
+//        this.currency = currency;
+//    }
 
     public static Money of(int amountUnits, String currency){
         return new Money(amountUnits, currency);

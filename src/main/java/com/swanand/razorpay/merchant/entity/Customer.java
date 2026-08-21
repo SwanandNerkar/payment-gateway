@@ -1,6 +1,7 @@
 package com.swanand.razorpay.merchant.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -9,6 +10,11 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "customer")
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Customer {
 
     @Id
