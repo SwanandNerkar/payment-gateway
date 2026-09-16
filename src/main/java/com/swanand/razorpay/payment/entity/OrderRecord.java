@@ -1,5 +1,6 @@
 package com.swanand.razorpay.payment.entity;
 
+import com.swanand.razorpay.common.entity.BaseEntity;
 import com.swanand.razorpay.common.entity.Money;
 import com.swanand.razorpay.common.enums.OrderStatus;
 import jakarta.persistence.*;
@@ -12,13 +13,17 @@ import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "order_record")
+@Table(name = "order_record",
+        indexes = {
+                @Index(name = "idx_order_id_merchant_id", columnList = "id, merchant_id"),
+                @Index(name = "idx_order_merchant_id", columnList = "merchant_id")
+        })
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderRecord {
+public class OrderRecord extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -36,7 +41,7 @@ public class OrderRecord {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", length = 20, nullable = false)
-    private OrderStatus orderStatus = OrderStatus.CREATED;
+    private OrderStatus status = OrderStatus.CREATED;
 
     @Column(nullable = false)
     @Builder.Default

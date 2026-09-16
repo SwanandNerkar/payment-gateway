@@ -1,5 +1,6 @@
 package com.swanand.razorpay.merchant.entity;
 
+import com.swanand.razorpay.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -9,13 +10,17 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "customer")
+@Table(name = "customer",
+        indexes = {
+                @Index(name = "idx_customer_merchant_id", columnList = "merchant_id"),
+                @Index(name = "idx_customer_email", columnList = "email")
+        })
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Customer {
+public class Customer extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -37,10 +42,5 @@ public class Customer {
     @Column(length = 20)
     private String gstId;
 
-    @CreatedDate
-    private LocalDateTime createAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 }
 
