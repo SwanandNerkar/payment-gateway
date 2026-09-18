@@ -2,10 +2,17 @@ package com.swanand.razorpay.payment.service;
 
 import com.swanand.razorpay.payment.dto.request.CreateOrderRequest;
 import com.swanand.razorpay.payment.dto.response.OrderResponse;
+import com.swanand.razorpay.payment.dto.response.PaymentResponse;
 
-import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 public interface OrderService {
     OrderResponse create(UUID merchantId, CreateOrderRequest request);
+
+    OrderResponse getById(UUID merchantId, UUID orderId);
+
+    OrderResponse cancel(UUID merchantId, UUID orderId);
+
+    List<PaymentResponse> listPayments(UUID merchantId, UUID orderId);
 }

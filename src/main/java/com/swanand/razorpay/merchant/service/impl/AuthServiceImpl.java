@@ -7,6 +7,7 @@ import com.swanand.razorpay.merchant.dto.request.MerchantSignupRequest;
 import com.swanand.razorpay.merchant.dto.response.MerchantResponse;
 import com.swanand.razorpay.merchant.entity.AppUser;
 import com.swanand.razorpay.merchant.entity.Merchant;
+import com.swanand.razorpay.merchant.mapper.MerchantMapper;
 import com.swanand.razorpay.merchant.repository.AppUserRepository;
 import com.swanand.razorpay.merchant.repository.MerchantRepository;
 import com.swanand.razorpay.merchant.service.AuthService;
@@ -23,6 +24,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final MerchantRepository merchantRepository;
     private final AppUserRepository appUserRepository;
+    private final MerchantMapper merchantMapper;
 
     @Override
     @Transactional
@@ -33,14 +35,9 @@ public class AuthServiceImpl implements AuthService {
                     "Merchant with provided email is already exists: "+ request.email());
         }
 
-        Merchant merchant = Merchant.builder()
-                .name(request.name())
-                .businessName(request.businessName())
-                .email(request.email())
-                .businessType(request.businessType())
-                .status(MerchantStatus.PENDING)
-                .build();
-        merchantRepository.save(merchant);
+        Merchant merchant = merchantMapper.toEntityFromSignUpRequest(request);
+        merchant.setStatus((MerchantStatus.PENDING_KYC));
+        merchant = merchantRepository.save(merchant);
 
         AppUser appUser = AppUser.builder()
                 .merchant(merchant)
@@ -51,9 +48,6 @@ public class AuthServiceImpl implements AuthService {
 
         appUserRepository.save(appUser);
 
-        // FIXME : use all args constructor, can be done with builder pattern but mapstruct will efficient.
-        return new MerchantResponse(merchant.getId(), merchant.getName(),
-                merchant.getEmail(), merchant.getBusinessName(),
-                merchant.getBusinessType(), merchant.getStatus());
+        return merchantMapper.toResponse(merchant);
     }
 }

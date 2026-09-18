@@ -1,9 +1,11 @@
 package com.swanand.razorpay.payment.entity;
 
+import com.swanand.razorpay.common.entity.BaseEntity;
 import com.swanand.razorpay.common.entity.Money;
 import com.swanand.razorpay.common.enums.PaymentMethod;
 import com.swanand.razorpay.common.enums.PaymentStatus;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -12,8 +14,16 @@ import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "payment")
-public class Payment {
+@Table(name = "payment",
+        indexes = {
+                @Index(name = "idx_payment_order_id_merchant_id", columnList = "order_id, merchant_id")
+        })
+@Getter
+@Setter
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+public class Payment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -24,7 +34,7 @@ public class Payment {
     private OrderRecord order;
 
     @Column(nullable = false)
-    private UUID merchantID;
+    private UUID merchantId;
 
     @Embedded
     private Money amount;
@@ -45,6 +55,9 @@ public class Payment {
 
     @Column(length = 100)
     private String bankReference;
+
+    @Column(length = 100)
+    private String processorReference;
 
     @Column(length = 100)
     private String errorCode;

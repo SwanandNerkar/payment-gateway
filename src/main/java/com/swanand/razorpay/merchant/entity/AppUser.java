@@ -1,5 +1,6 @@
 package com.swanand.razorpay.merchant.entity;
 
+import com.swanand.razorpay.common.entity.BaseEntity;
 import com.swanand.razorpay.common.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,13 +11,16 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "app_user")
+@Table(name = "app_user",
+        indexes = {
+            @Index(name = "idx_app_user_merchant_id", columnList = "merchant_id")
+        })
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppUser {
+public class AppUser extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -36,9 +40,4 @@ public class AppUser {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @CreatedDate
-    private LocalDateTime createAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 }
