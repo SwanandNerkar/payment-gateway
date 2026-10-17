@@ -77,7 +77,8 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setErrorDescription(failure.errorDescription());
         }
         else if(paymentResult instanceof PaymentResult.Success success){
-
+            log.info("Invalid State");
+            return null;
         }
 
 
@@ -89,6 +90,8 @@ public class PaymentServiceImpl implements PaymentService {
 
         payment = paymentRepository.save(payment);
         order = orderRepository.save(order);
+
+        // TODO : send an outbox (kafka event)
 
         return paymentMapper.toResponse(payment);
     }

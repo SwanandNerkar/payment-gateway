@@ -16,3 +16,24 @@ spring:
 
 server:
   port: 8081
+
+vault:
+  master-key: asdfw3492r8falldj234988aoasd
+
+payment:
+  simulator:
+    poll-interval-ms : 5000
+    chaos-mode : NORMAL   // SUCCESS, SLOW, TIMEOUT, FAILURE
+    method:
+      CARD:
+        min-delay-seconds: 2
+        max-delay-seconds: 6
+        success-rate: 90
+      UPI:
+        min-delay-seconds: 2
+        max-delay-seconds: 6
+        success-rate: 90
+      NET_BANKING:
+        min-delay-seconds: 2
+        max-delay-seconds: 6
+        success-rate: 90
