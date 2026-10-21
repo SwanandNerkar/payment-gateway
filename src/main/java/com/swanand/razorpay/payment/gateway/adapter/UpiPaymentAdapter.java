@@ -19,6 +19,7 @@ import java.util.UUID;
 public class UpiPaymentAdapter implements PaymentAdapter {
 
     private final PaymentProcessorRouter paymentProcessorRouter;
+    
     @Override
     public PaymentResult initiate(PaymentRequest request) {
         log.info("Initiate Payment with UpiPaymentAdapter, paymentId : " + request.paymentId());
@@ -33,16 +34,14 @@ public class UpiPaymentAdapter implements PaymentAdapter {
             PaymentProcessorResponse paymentProcessorResponse =
                     paymentProcessorRouter.charge(paymentProcessorRequest);
 
-            PaymentResult paymentResult = null;
-            if (paymentProcessorResponse instanceof PaymentProcessorResponse.Failure failure) {
-                paymentResult = new PaymentResult.Failure(failure.errorCode(), failure.errorDescription());
-            } else if (paymentProcessorResponse instanceof PaymentProcessorResponse.Pending pending) {
-                paymentResult = new PaymentResult.Pending(pending.processorReference());
-            } else if (paymentProcessorResponse instanceof PaymentProcessorResponse.Success success) {
-                paymentResult = new PaymentResult.Success(success.bankReference()); // processor reference didn't use
-            }
-
-            return paymentResult;
+            return switch (paymentProcessorResponse){
+                case PaymentProcessorResponse.Failure failure ->
+                        new PaymentResult.Failure(failure.errorCode(), failure.errorDescription());
+                case PaymentProcessorResponse.Pending pending ->
+                        new PaymentResult.Pending(pending.processorReference());
+                case PaymentProcessorResponse.Success success ->
+                        new PaymentResult.Success(success.bankReference());
+            };
         } catch (Exception e) {
             log.warn("UpiPayment failed, paymentId: {}", request.paymentId());
             return new PaymentResult.Failure("UPI_FAILED", e.getMessage());

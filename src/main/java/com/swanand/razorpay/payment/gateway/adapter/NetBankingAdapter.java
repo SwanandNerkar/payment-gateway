@@ -19,6 +19,7 @@ import java.util.UUID;
 public class NetBankingAdapter implements PaymentAdapter {
 
     private final PaymentProcessorRouter paymentProcessorRouter;
+
     @Override
     public PaymentResult initiate(PaymentRequest request) {
         log.info("Initiate Payment with NetBankingAdapter, paymentId : "+ request.paymentId());
@@ -33,21 +34,12 @@ public class NetBankingAdapter implements PaymentAdapter {
             PaymentProcessorResponse paymentProcessorResponse =
                     paymentProcessorRouter.charge(paymentProcessorRequest);
 
-            // FIXME : solve , install new intellij 2026
-//        return switch (paymentProcessorRouter){
-//            case PaymentProcessorResponse.Failure failure ->
-//        };
+            return switch (paymentProcessorResponse){
+                case PaymentProcessorResponse.Failure failure -> new PaymentResult.Failure(failure.errorCode(), failure.errorDescription());
+                case PaymentProcessorResponse.Pending pending -> new PaymentResult.Pending(pending.processorReference());
+                case PaymentProcessorResponse.Success success -> new PaymentResult.Success(success.bankReference());
+            };
 
-            PaymentResult paymentResult = null;
-            if (paymentProcessorResponse instanceof PaymentProcessorResponse.Failure failure) {
-                paymentResult = new PaymentResult.Failure(failure.errorCode(), failure.errorDescription());
-            } else if (paymentProcessorResponse instanceof PaymentProcessorResponse.Pending pending) {
-                paymentResult = new PaymentResult.Pending(pending.processorReference());
-            } else if (paymentProcessorResponse instanceof PaymentProcessorResponse.Success success) {
-                paymentResult = new PaymentResult.Success(success.bankReference()); // processor reference didn't use
-            }
-
-            return paymentResult;
         }
         catch (Exception e){
             log.warn("NetBanking failed, paymentId: {}", request.paymentId());
