@@ -22,25 +22,18 @@ public class CardPaymentAdapter implements PaymentAdapter {
     public PaymentResult initiate(PaymentRequest request) {
         String token = (String) request.methodDetails().get("token");
 
-        PaymentProcessorResponse response = vaultService.charge(
+        PaymentProcessorResponse paymentProcessorResponse = vaultService.charge(
                 request.paymentId(), token, request.amount(), request.methodDetails()
         );
 
-//        return switch (response){
-//            case PaymentProcessorResponse.Success success -> new PaymentResult.Success(success.bankReference());
-//        };
-
-        PaymentResult result = null;
-
-        if( response instanceof  PaymentProcessorResponse.Success success){
-            result =  new PaymentResult.Success(success.bankReference());
-        } else if(response instanceof PaymentProcessorResponse.Failure failure){
-            result = new PaymentResult.Failure(failure.errorCode(), failure.errorDescription());
-        } else if(response instanceof PaymentProcessorResponse.Pending pending){
-            result = new PaymentResult.Pending(pending.processorReference());
-        }
-
-        return result;
+        return switch (paymentProcessorResponse){
+            case PaymentProcessorResponse.Failure failure ->
+                    new PaymentResult.Failure(failure.errorCode(), failure.errorDescription());
+            case PaymentProcessorResponse.Pending pending ->
+                    new PaymentResult.Pending(pending.processorReference());
+            case PaymentProcessorResponse.Success success ->
+                    new PaymentResult.Success(success.bankReference());
+        };
     }
 
     @Override

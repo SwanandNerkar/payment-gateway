@@ -20,6 +20,7 @@ import com.swanand.razorpay.payment.service.PaymentService;
 import com.swanand.razorpay.payment.statemachine.PaymentTransitionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,27 +67,20 @@ public class PaymentServiceImpl implements PaymentService {
 
         PaymentResult paymentResult =  paymentGatewayRouter.initiate(paymentRequest);
 
-        // can use switch case
-        if(paymentResult instanceof PaymentResult.Pending pending){
-            payment.setProcessorReference(pending.registrationRef());
+        switch (paymentResult){
+            case PaymentResult.Failure failure -> {
+                paymentTransitionService.apply(payment, PaymentEvent.AUTHORIZE_FAIL);
+                payment.setErrorCode(failure.errorCode());
+                payment.setErrorDescription(failure.errorDescription());
+            }
+            case PaymentResult.Pending pending -> {
+                payment.setProcessorReference(pending.registrationRef());
+            }
+            case PaymentResult.Success success -> {
+                log.info("Invalid State");
+                return null;
+            }
         }
-        else if(paymentResult instanceof PaymentResult.Failure failure){
-//            payment.setStatus(PaymentStatus.FAILED);
-            paymentTransitionService.apply(payment, PaymentEvent.AUTHORIZE_FAIL);
-            payment.setErrorCode(failure.errorCode());
-            payment.setErrorDescription(failure.errorDescription());
-        }
-        else if(paymentResult instanceof PaymentResult.Success success){
-            log.info("Invalid State");
-            return null;
-        }
-
-
-            // FIXME : can't use patterns in switch, address this problem
-//        switch (paymentRequest){
-//            case PaymentResult.Pending pending -> payment.setProcessorReference(pending.registrationRef());
-//
-//        }
 
         payment = paymentRepository.save(payment);
         order = orderRepository.save(order);
